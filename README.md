@@ -1,12 +1,12 @@
-#Task Overview:
+Task Overview:
 You have 24 hours to complete the task from the time you receive this email. The task involves optimizing and upgrading an existing React Native application to improve its usability and functionality. You need to document your thought process, steps taken, and improvements made as clearly as possible.
 
-#Task Details:
+Task Details:
 
 	•	The initial code provided implements a basic film searcher application using the OMDb API.
 	•	You are required to enhance the application by improving its functionality, ensuring smooth operation, and adding new features.
 
-#Requirements:
+Requirements:
 
 	1.	Optimization and Debugging:
 	•	Fix any issues causing the application to crash.
