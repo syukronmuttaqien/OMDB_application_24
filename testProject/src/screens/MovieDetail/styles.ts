@@ -30,6 +30,9 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
   },
+  genre: {
+    marginRight: 8,
+  },
   detailPadding: {
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,

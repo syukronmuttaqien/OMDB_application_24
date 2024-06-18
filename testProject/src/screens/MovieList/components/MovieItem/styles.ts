@@ -10,7 +10,6 @@ export const styles = StyleSheet.create({
     marginVertical: 12,
     backgroundColor: Colors.white,
     borderRadius: 10,
-    elevation: 3,
   },
   moviteTitleContainer: {
     flex: 1,
