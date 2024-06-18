@@ -6,7 +6,7 @@ I have several step to complete this Test Project.
 
   
 
-**Step 1: [Changing From Expo to Bare React Native]**(https://github.com/syukronmuttaqien/OMDB_application_24/pull/1)
+**Step 1: [Changing From Expo to Bare React Native](https://github.com/syukronmuttaqien/OMDB_application_24/pull/1)**
 
 From My Perspective, Expo is quite useful, but Expo has a Limited Access to the Native API especially when we want to create a Native Modules.
 
