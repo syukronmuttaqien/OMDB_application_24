@@ -63,10 +63,10 @@ export default function MovieDetail() {
           <Spacing orientation="vertical" amount={16} />
           <View style={styles.genreContainer}>
             {genres.map((genre, index) => (
-              <>
-                <GenreItem key={index} text={genre} />
+              <View style={styles.genre} key={index}>
+                <GenreItem text={genre} />
                 <Spacing orientation="horizontal" amount={4} />
-              </>
+              </View>
             ))}
           </View>
           <Spacing orientation="vertical" amount={16} />
