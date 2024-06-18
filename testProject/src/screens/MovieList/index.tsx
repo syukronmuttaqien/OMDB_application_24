@@ -1,14 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacity,
   StatusBar,
-  Alert,
   FlatList,
+  RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,13 +13,21 @@ import { styles } from "./styles";
 import { MovieSearch } from "../../models/movie.model";
 import { Loading } from "../../components/Loading";
 import { useMovieQuery } from "../../data/movie.remote";
-import { MovieItem } from "./MovieItem";
+import { MovieItem } from "./components/MovieItem";
+import { InputText, Spacing } from "../../components";
+import { debounce } from "lodash";
+import { EmptyPlaceholder } from "./components/EmptyPlaceholder";
+import { NextPageLoading } from "./components/NextPageLoading";
 
 export default function MovieList() {
   const navigation = useNavigation();
-  const [searchText, setSearchText] = useState("Star");
+  const [movies, setMovies] = useState<MovieSearch[]>([]);
+  const [searchText, setSearchText] = useState("");
+  const [totalMovies, setTotalMovies] = useState(0);
+  const [isNextPage, setIsNextPage] = useState(false);
+  const [page, setPage] = useState(1);
 
-  const { data: movies, isFetching } = useMovieQuery({ search: searchText });
+  const { mutateAsync: handleSearch, isPending } = useMovieQuery();
 
   const handlePress = (movie: MovieSearch) => {
     // Navigate to details page with the selected movie
@@ -32,21 +35,96 @@ export default function MovieList() {
     navigation.navigate("MovieDetail", { movie });
   };
 
-  if (isFetching) {
-    return <Loading text="Fetching Movies..." />;
-  }
+  const handleTextChange = (value: string) => {
+    setSearchText(value);
+    debounceHandleSearch(value);
+  };
+
+  const handleNextPage = useCallback(
+    debounce(async (text, page) => {
+      const response = await handleSearch({ search: text, page });
+
+      if (response.Response === "True") {
+        const oldMovies = movies.slice();
+        const newMovies = oldMovies.concat(response.Search);
+        setPage(page);
+        setMovies(newMovies);
+        setIsNextPage(false);
+        return;
+      }
+
+      setPage(page);
+      setMovies([]);
+      setIsNextPage(false);
+    }, 1000),
+    [movies, page]
+  );
+
+  // Use Debounce Function and Callback,so the API won't triggered when we typing
+  const debounceHandleSearch = useCallback(
+    debounce(async (text: string) => {
+      const response = await handleSearch({ search: text, page: 1 });
+
+      if (response.Response === "True") {
+        setMovies(response.Search);
+        setTotalMovies(Number(response.totalResults));
+        setPage(1);
+        return;
+      }
+
+      setMovies([]);
+    }, 1000),
+    []
+  );
+
+  // const placeholderVisible =
+  //   searchText.trim() === "" || (movies?.Search.length || [].length) < 1;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView edges={["bottom"]} style={styles.container}>
       <StatusBar barStyle="default" />
-      <Text style={styles.title}>Film Searcher</Text>
+      <InputText
+        onChangeText={handleTextChange}
+        value={searchText}
+        defaultValue=""
+      />
+
       <FlatList
         style={styles.scrollView}
-        data={movies?.Search || []}
-        extraData={isFetching}
+        data={movies}
+        extraData={isNextPage}
+        refreshControl={
+          <RefreshControl
+            refreshing={false}
+            onRefresh={() => {
+              handleSearch({ search: searchText, page: 1 });
+            }}
+          />
+        }
+        ListEmptyComponent={
+          <>
+            <Spacing orientation="vertical" amount={100} />
+            <EmptyPlaceholder
+              visible={true}
+              state={searchText.trim() === "" ? "empty" : "not-found"}
+            />
+          </>
+        }
+        ListFooterComponent={isNextPage ? <NextPageLoading /> : undefined}
         renderItem={({ item: movie }) => (
           <MovieItem movie={movie} onPress={handlePress} />
         )}
+        onEndReachedThreshold={0.8}
+        onEndReached={() => {
+          if (
+            !isPending &&
+            movies.length < totalMovies &&
+            movies.length >= 10
+          ) {
+            setIsNextPage(true);
+            handleNextPage(searchText, page + 1);
+          }
+        }}
       />
     </SafeAreaView>
   );

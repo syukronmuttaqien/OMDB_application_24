@@ -30,7 +30,7 @@ export default function App() {
         <Stack.Navigator initialRouteName="MovieList">
           <Stack.Screen
             options={{
-              headerShown: false,
+              title: "Film Searcher",
             }}
             name="MovieList"
             component={MovieList}
