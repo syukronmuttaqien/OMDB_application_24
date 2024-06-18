@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   StatusBar,
   FlatList,
@@ -11,7 +11,6 @@ import { useNavigation } from "@react-navigation/native";
 
 import { styles } from "./styles";
 import { MovieSearch } from "../../models/movie.model";
-import { Loading } from "../../components/Loading";
 import { useMovieQuery } from "../../data/movie.remote";
 import { MovieItem } from "./components/MovieItem";
 import { InputText, Spacing } from "../../components";
@@ -40,10 +39,12 @@ export default function MovieList() {
     debounceHandleSearch(value);
   };
 
+  // For Handling Next Page and using debounce and useCallback to disable the looping activation.
   const handleNextPage = useCallback(
     debounce(async (text, page) => {
       const response = await handleSearch({ search: text, page });
 
+      // / If Response is success, handle the data
       if (response.Response === "True") {
         const oldMovies = movies.slice();
         const newMovies = oldMovies.concat(response.Search);
@@ -53,6 +54,7 @@ export default function MovieList() {
         return;
       }
 
+      // For Error Handling, because When Error ombd API Still return status code 200
       setPage(page);
       setMovies([]);
       setIsNextPage(false);
@@ -65,6 +67,7 @@ export default function MovieList() {
     debounce(async (text: string) => {
       const response = await handleSearch({ search: text, page: 1 });
 
+      // If Response is success, handle the data
       if (response.Response === "True") {
         setMovies(response.Search);
         setTotalMovies(Number(response.totalResults));
@@ -72,13 +75,13 @@ export default function MovieList() {
         return;
       }
 
+      // For Error Handling, because When Error ombd API Still return status code 200
+      setPage(1);
+      setTotalMovies(0);
       setMovies([]);
     }, 1000),
     []
   );
-
-  // const placeholderVisible =
-  //   searchText.trim() === "" || (movies?.Search.length || [].length) < 1;
 
   return (
     <SafeAreaView edges={["bottom"]} style={styles.container}>
@@ -86,6 +89,7 @@ export default function MovieList() {
       <InputText
         onChangeText={handleTextChange}
         value={searchText}
+        placeholder="Search movie title here"
         defaultValue=""
       />
 
@@ -110,7 +114,9 @@ export default function MovieList() {
             />
           </>
         }
-        ListFooterComponent={isNextPage ? <NextPageLoading /> : undefined}
+        ListFooterComponent={
+          isNextPage || isPending ? <NextPageLoading /> : undefined
+        }
         renderItem={({ item: movie }) => (
           <MovieItem movie={movie} onPress={handlePress} />
         )}

@@ -10,6 +10,7 @@ interface Props {
   onPress: (movie: MovieSearch) => void;
 }
 
+// If image not found, the image should load this
 const placeholderUrl =
   "https://via.placeholder.com/150x100?text=Image+Not+Found";
 
