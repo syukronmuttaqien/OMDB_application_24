@@ -15,20 +15,6 @@ export const styles = StyleSheet.create({
   },
   scrollView: {
     width: "100%",
-    height: 200,
-  },
-  movieContainer: {
-    width: 150,
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 10,
-    padding: 10,
-    backgroundColor: Colors.white,
-    borderRadius: 10,
-    elevation: 3,
-  },
-  movieTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
+    flex: 1,
   },
 });

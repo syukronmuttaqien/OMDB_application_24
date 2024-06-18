@@ -8,58 +8,46 @@ import {
   TouchableOpacity,
   StatusBar,
   Alert,
+  FlatList,
 } from "react-native";
-import { styles } from "./styles";
-import { ApiConfig } from "../../config/api";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+
+import { styles } from "./styles";
 import { MovieSearch } from "../../models/movie.model";
+import { Loading } from "../../components/Loading";
+import { useMovieQuery } from "../../data/movie.remote";
+import { MovieItem } from "./MovieItem";
 
 export default function MovieList() {
   const navigation = useNavigation();
+  const [searchText, setSearchText] = useState("Star");
 
-  const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch(`${ApiConfig.BASE_URL}&s=star`) // Replace 'your_api_key' with the actual key from OMDb API
-      .then((response) => {
-        console.log("Response: ", response);
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Data: ", data);
-        setMovies(data.Search);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log("Error: ", error);
-        setLoading(false);
-      });
-  }, []);
+  const { data: movies, isFetching } = useMovieQuery({ search: searchText });
 
   const handlePress = (movie: MovieSearch) => {
     // Navigate to details page with the selected movie
-    navigation.navigate("MovieDetail", { movieId: movie.imdbID });
+    // @ts-ignore
+    navigation.navigate("MovieDetail", { movie });
   };
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+  if (isFetching) {
+    return <Loading text="Fetching Movies..." />;
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Film Searcher</Text>
-      <ScrollView horizontal style={styles.scrollView}>
-        {movies.map((movie: MovieSearch, index) => (
-          <TouchableOpacity key={index} onPress={() => handlePress(movie)}>
-            <View style={styles.movieContainer}>
-              <Text style={styles.movieTitle}>{movie.Title}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
       <StatusBar barStyle="default" />
+      <Text style={styles.title}>Film Searcher</Text>
+      <FlatList
+        style={styles.scrollView}
+        data={movies?.Search || []}
+        extraData={isFetching}
+        renderItem={({ item: movie }) => (
+          <MovieItem movie={movie} onPress={handlePress} />
+        )}
+      />
     </SafeAreaView>
   );
 }
