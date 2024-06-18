@@ -1,7 +1,4 @@
 {
-  "expo": {
-    "name": "testProject",
-    "slug": "testProject",
-    "version": "1.0.0"
-  }
+  "name": "testProject",
+  "displayName": "testProject"
 }

@@ -1,26 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+  StatusBar,
+  Alert,
+} from "react-native";
 
 export default function App() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://www.omdbapi.com/?s=star&apikey=your_api_key')  // Replace 'your_api_key' with the actual key from OMDb API
-      .then(response => response.json())
-      .then(data => {
+    fetch("http://www.omdbapi.com/?s=star&apikey=your_api_key") // Replace 'your_api_key' with the actual key from OMDb API
+      .then((response) => response.json())
+      .then((data) => {
         setMovies(data.Search);
         setLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         setLoading(false);
       });
   }, []);
 
-  const handlePress = (movie) => {
+  const handlePress = (movie: any) => {
     // Navigate to details page with the selected movie
-    alert(`Selected movie: ${movie.Title}`);
+    Alert.alert(`Selected movie: ${movie.Title}`);
   };
 
   if (loading) {
@@ -39,7 +47,7 @@ export default function App() {
           </TouchableOpacity>
         ))}
       </ScrollView>
-      <StatusBar style="auto" />
+      <StatusBar barStyle="default" />
     </View>
   );
 }
@@ -47,31 +55,31 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   scrollView: {
-    width: '100%',
+    width: "100%",
     height: 200,
   },
   movieContainer: {
     width: 150,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     margin: 10,
     padding: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     elevation: 3,
   },
   movieTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
