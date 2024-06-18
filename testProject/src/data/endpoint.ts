@@ -4,8 +4,11 @@ import {
   MovieResponseDto,
 } from "../models/movie.model";
 
-export const getMovies = async (search: string): Promise<MovieResponseDto> => {
-  const response = await ApiClient.get(`${API_URL}&s=${search}`);
+export const getMovies = async (
+  search: string,
+  page: number = 1
+): Promise<MovieResponseDto> => {
+  const response = await ApiClient.get(`${API_URL}&s=${search}&page=${page}`);
   return response.data;
 };
 
